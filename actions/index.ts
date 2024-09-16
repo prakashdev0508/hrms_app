@@ -48,3 +48,21 @@ export const checkIn = async (data: any) => {
     throw error;
   }
 };
+
+export const checkOut = async (data: any) => {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/attendence/check-out`,
+      data,
+      {
+        headers: {
+          Authorization: `${token}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error: any) {
+    throw error;
+  }
+};
