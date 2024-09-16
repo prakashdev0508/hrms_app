@@ -74,7 +74,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         "organizationDetails",
         response?.organizationId
       );
-      router.push("/(tabs)")
+      router.push("/(tabs)");
       ToastAndroid.show("Logged In", ToastAndroid.TOP);
     } catch (error: any) {
       // ToastAndroid.show(error?.response?.data?.message, ToastAndroid.BOTTOM);
@@ -94,6 +94,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     await SecureStore.deleteItemAsync(TOKEN_KEY);
+    await SecureStore.deleteItemAsync("role");
+    await SecureStore.deleteItemAsync("organizationDetails");
+    router.push("/(auth)/Login");
     setAuthState({
       token: null,
       authenticated: false,
