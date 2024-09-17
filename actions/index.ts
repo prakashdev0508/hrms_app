@@ -5,11 +5,9 @@ import * as Location from "expo-location";
 const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL;
 let token: any = null;
 
-const getToken = async () => {
+export const getToken = async () => {
   token = await SecureStore.getItemAsync("accessToken");
 };
-
-getToken();
 
 export const loginUser = async (data: any) => {
   try {
@@ -42,7 +40,6 @@ export const checkIn = async (data: any) => {
         Authorization: `${token}`,
       },
     });
-
     return response.data;
   } catch (error: any) {
     throw error;
@@ -66,3 +63,5 @@ export const checkOut = async (data: any) => {
     throw error;
   }
 };
+
+getToken();

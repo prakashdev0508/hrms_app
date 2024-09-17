@@ -11,8 +11,8 @@ const TabIcon = ({
   focused: boolean;
 }) => (
   <View
-    className={`flex flex-row justify-center items-center rounded-full ${
-      focused ? "bg-general-300" : ""
+    className={`flex flex-row justify-center p-5 items-center rounded-full ${
+      focused ? "bg-white" : ""
     }`}
   >
     <View
