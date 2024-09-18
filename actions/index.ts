@@ -64,4 +64,18 @@ export const checkOut = async (data: any) => {
   }
 };
 
+export const getRequestList = async () => {
+  try {
+    const response = await axios.get(`${BASE_URL}/app/request_data`, {
+      headers: {
+        Authorization: `${token}`,
+      },
+    });
+
+    return response.data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
 getToken();

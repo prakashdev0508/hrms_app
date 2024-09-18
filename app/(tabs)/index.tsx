@@ -1,34 +1,35 @@
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   ScrollView,
   RefreshControl,
-  FlatList
+  Animated,
+  TouchableWithoutFeedback,
+  StyleSheet,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useEffect, useState } from "react";
-import { FontAwesome, Entypo, MaterialIcons } from "@expo/vector-icons";
+import {
+  FontAwesome,
+  Entypo,
+  MaterialIcons,
+  AntDesign,
+} from "@expo/vector-icons";
 import { checkIn, checkOut, getAppHomeDetails, getToken } from "@/actions";
 import * as Location from "expo-location";
 import Toast from "react-native-root-toast";
 import moment from "moment";
 
-const renderOrganizationMember = ({ item }: any) => (
-  <View className="bg-white p-4 rounded-lg shadow-lg mb-2">
-    <Text className="font-bold text-gray-700">{item.name}</Text>
-    <Text className="text-gray-500">{item.email}</Text>
-    <Text className="text-gray-500">Role: {item.role}</Text>
-    <Text className="text-gray-500">
-      Status: {item.is_active ? "Active" : "Inactive"}
-    </Text>
-  </View>
-);
-
 export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [homeData, setHomeData] = useState<any>(null);
   const [buttonLoader, setButtonLoader] = useState(false);
+  const [showPlusDropdown, setShowPlusDropdown] = useState(false);
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
+
+  const plusDropdownAnim = useRef(new Animated.Value(0)).current;
+  const userDropdownAnim = useRef(new Animated.Value(0)).current;
 
   const fetchData = async () => {
     setRefreshing(true);
@@ -48,14 +49,13 @@ export default function HomeScreen() {
     getToken();
   }, []);
 
-  const onRefresh = () => {
+  const onRefresh = async () => {
     setRefreshing(true);
-    setTimeout(async () => {
-      await fetchData();
-      console.log("Data refreshed");
-      setRefreshing(false);
-    }, 2000);
+    await fetchData();
+    console.log("Data refreshed");
+    setRefreshing(false);
   };
+
   const handleCheckIn = async () => {
     let { status: initialStatus } =
       await Location.getForegroundPermissionsAsync();
@@ -187,6 +187,35 @@ export default function HomeScreen() {
     }
   };
 
+  const togglePlusDropdown = () => {
+    setShowPlusDropdown(!showPlusDropdown);
+    setShowUserDropdown(false);
+
+    Animated.timing(plusDropdownAnim, {
+      toValue: showPlusDropdown ? 0 : 1,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
+  };
+
+  const toggleUserDropdown = () => {
+    setShowUserDropdown(!showUserDropdown);
+    setShowPlusDropdown(false);
+
+    Animated.timing(userDropdownAnim, {
+      toValue: showUserDropdown ? 0 : 1,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
+  };
+
+  const handleOutsideClick = (event: any) => {
+    if (!event.target.closest(".dropdown")) {
+      setShowPlusDropdown(false);
+      setShowUserDropdown(false);
+    }
+  };
+
   return (
     <SafeAreaView className="bg-white flex-1">
       <ScrollView
@@ -195,21 +224,99 @@ export default function HomeScreen() {
         }
       >
         {refreshing ? (
-          <>
-            <View className=" text-center ">
-              <Text>Loading...</Text>
-            </View>
-          </>
+          <View className="text-center">
+            <Text>Loading...</Text>
+          </View>
         ) : (
           <>
             {/* Header Section */}
             <View className="bg-purple-600 p-4 rounded-b-3xl z-10">
-              <View className="flex-row justify-between items-center">
-                <Text className="text-white text-sm">{getGreeting()}</Text>
+              <View className="flex-row justify-between">
+                <View>
+                  <View className="flex-row justify-between items-center">
+                    <Text className="text-white text-sm">{getGreeting()}</Text>
+                  </View>
+                  <Text className="text-white text-2xl font-bold">
+                    {homeData?.userDetails?.name}
+                  </Text>
+                </View>
+                <View className="flex-row items-center space-x-4">
+                  <TouchableOpacity onPress={togglePlusDropdown}>
+                    <AntDesign name="pluscircle" size={32} color="white" />
+                  </TouchableOpacity>
+                  {showPlusDropdown && (
+                    <Animated.View
+                      style={[
+                        styles.dropdown,
+                        {
+                          opacity: plusDropdownAnim.interpolate({
+                            inputRange: [0, 1],
+                            outputRange: [0, 1],
+                          }),
+                          transform: [
+                            {
+                              translateY: plusDropdownAnim.interpolate({
+                                inputRange: [0, 1],
+                                outputRange: [20, 0],
+                              }),
+                            },
+                          ],
+                        },
+                      ]}
+                      className="absolute right-10 top-12 bg-white rounded-md shadow-lg p-2 z-50 border border-gray-300 dropdown"
+                    >
+                      <TouchableOpacity
+                        onPress={() => console.log("Leave clicked")}
+                      >
+                        <Text className="p-2">Leave</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => console.log("Regularisation clicked")}
+                      >
+                        <Text className="p-2">Regularisation</Text>
+                      </TouchableOpacity>
+                    </Animated.View>
+                  )}
+
+                  <TouchableOpacity onPress={toggleUserDropdown}>
+                    <FontAwesome name="user-circle" size={32} color="white" />
+                  </TouchableOpacity>
+                  {showUserDropdown && (
+                    <Animated.View
+                      style={[
+                        styles.dropdown,
+                        {
+                          opacity: userDropdownAnim.interpolate({
+                            inputRange: [0, 1],
+                            outputRange: [0, 1],
+                          }),
+                          transform: [
+                            {
+                              translateY: userDropdownAnim.interpolate({
+                                inputRange: [0, 1],
+                                outputRange: [20, 0],
+                              }),
+                            },
+                          ],
+                        },
+                      ]}
+                      className="absolute right-2 top-12 bg-white rounded-md shadow-lg p-2 z-50 border border-gray-300 dropdown"
+                    >
+                      <TouchableOpacity
+                        onPress={() => console.log("Profile clicked")}
+                      >
+                        <Text className="p-2">Profile</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => console.log("Logout clicked")}
+                      >
+                        <Text className="p-2">Logout</Text>
+                      </TouchableOpacity>
+                    </Animated.View>
+                  )}
+                </View>
               </View>
-              <Text className="text-white text-2xl font-bold">
-                {homeData?.userDetails?.name}
-              </Text>
+
               <View className="p-6 mt-4">
                 <View className="bg-white p-4 rounded-xl shadow-lg">
                   <Text className="text-center text-lg font-semibold text-gray-700 mb-2">
@@ -222,11 +329,11 @@ export default function HomeScreen() {
                   {(homeData?.attendanceStatus == "not_available" ||
                     homeData?.attendanceStatus == "paid_leave") && (
                     <TouchableOpacity
-                      className={` ${
+                      className={`${
                         buttonLoader
-                          ? " bg-green-300 cursor-not-allowed "
-                          : "bg-green-500 "
-                      } p-4 rounded-lg `}
+                          ? "bg-green-300 cursor-not-allowed"
+                          : "bg-green-500"
+                      } p-4 rounded-lg`}
                       onPress={handleCheckIn}
                       disabled={buttonLoader}
                     >
@@ -239,11 +346,11 @@ export default function HomeScreen() {
                     (homeData?.attendanceStatus == "checked_in" &&
                       homeData?.attendanceStatus == "paid_leave")) && (
                     <TouchableOpacity
-                      className={` ${
+                      className={`${
                         buttonLoader
-                          ? " bg-red-300 cursor-not-allowed "
-                          : "bg-red-500 "
-                      } p-4 rounded-lg `}
+                          ? "bg-red-300 cursor-not-allowed"
+                          : "bg-red-500"
+                      } p-4 rounded-lg`}
                       onPress={handleCheckOut}
                       disabled={buttonLoader}
                     >
@@ -257,7 +364,7 @@ export default function HomeScreen() {
                     homeData?.attendanceStatus != "paid_leave" &&
                     homeData?.attendanceStatus != "not_available" && (
                       <TouchableOpacity
-                        className={` bg-gray-500  p-4 rounded-lg `}
+                        className={`bg-gray-500 p-4 rounded-lg`}
                       >
                         <Text className="text-center text-white font-bold text-lg">
                           {getName(homeData?.attendanceStatus)}
@@ -313,7 +420,8 @@ export default function HomeScreen() {
                 </View>
                 <View className="bg-white p-4 rounded-lg shadow-lg w-2/5">
                   <Text className="text-center text-xl font-bold text-green-600">
-                    {Number(homeData?.totalAllottedLeave)  -  Number(homeData?.leaveTaken)}
+                    {Number(homeData?.totalAllottedLeave) -
+                      Number(homeData?.leaveTaken)}
                   </Text>
                   <Text className="text-center text-gray-500">
                     Leaves Available
@@ -327,3 +435,18 @@ export default function HomeScreen() {
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  dropdown: {
+    position: "absolute",
+    backgroundColor: "white",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+});
