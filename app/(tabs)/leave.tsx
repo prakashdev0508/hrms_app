@@ -1,9 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  ActivityIndicator,
+} from "react-native";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import { getRequestList } from "@/actions";
 import { useWindowDimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import moment from "moment";
 
 export default function LeaveScreen() {
   const [requestData, setRequestData] = useState<any>(null);
@@ -32,50 +39,113 @@ export default function LeaveScreen() {
   }, []);
 
   const renderLeaveItem = ({ item }: any) => (
-    <View style={{ padding: 10, borderBottomWidth: 1, borderBottomColor: "#ddd" }}>
-      <Text>Leave Type: {item.leaveType}</Text>
-      <Text>Start Date: {new Date(item.startDate).toDateString()}</Text>
-      <Text>End Date: {new Date(item.endDate).toDateString()}</Text>
-      <Text>Status: {item.status}</Text>
-      <Text>Reason: {item.reason}</Text>
-      <Text>Approved By: {item.approvedBy?.name || "N/A"}</Text>
+    <View style={styles.card}>
+      <View className=" flex-row justify-between">
+        {/* <Text className=" font-JakartaSemiBold mb-3">
+          {" "}
+          {moment(item?.appliedDate).format("D MMM YYYY")}{" "}
+        </Text> */}
+        <View className=" flex-row mb-1 ">
+          <Text className="font-JakartaBold">{moment(item?.startDate).format("D MMM YYYY")}</Text>
+          <Text className=" mx-1 ">--</Text>
+          <Text className="font-JakartaBold">{moment(item?.endDate).format("D MMM YYYY")}</Text>
+        </View>
+        <Text 
+          className={` px-2 py-1 rounded-md text-xs font-JakartaSemiBold uppercase flex-row`}
+        >
+          {" "}
+          <View
+            className={`${
+              item?.status == "approved"
+                ? "bg-green-500"
+                : item?.status == "pending"
+                ? "bg-yellow-500"
+                : item?.status == "rejected"
+                ? "bg-red-500"
+                : "bg-gray-400"
+            } h-[9px] mr-2 w-[9px] justify-center rounded-full`}
+          ></View>{" "}
+          {item?.status}
+        </Text>
+      </View>
+      <Text style={styles.subText}> {item?.reason} </Text>
+      <Text className="">{moment(item?.appliedDate).format("D MMM YYYY")}</Text>
+
+
     </View>
   );
 
   const renderRegularizationItem = ({ item }: any) => (
-    <View style={{ padding: 10, borderBottomWidth: 1, borderBottomColor: "#ddd" }}>
-      <Text>Date: {new Date(item.date).toDateString()}</Text>
-      <Text>Status: {item.status}</Text>
-      <Text>Check-In Time: {new Date(item.checkInTime).toLocaleTimeString()}</Text>
-      <Text>Check-Out Time: {new Date(item.checkOutTime).toLocaleTimeString()}</Text>
-      <Text>Reason: {item.regularizationReason}</Text>
+    <View style={styles.card}>
+      <View className=" flex-row justify-between">
+        <Text className=" font-JakartaSemiBold mb-3">
+          {" "}
+          {moment(item?.appliedDate).format("D MMM YYYY")}{" "}
+        </Text>
+        <Text
+          className={` px-2 py-1 rounded-md text-xs font-JakartaSemiBold uppercase flex-row`}
+        >
+          {" "}
+          <View
+            className={`${
+              item?.status == "approved"
+                ? "bg-green-500"
+                : item?.status == "pending"
+                ? "bg-yellow-500"
+                : item?.status == "rejected"
+                ? "bg-red-500"
+                : "bg-gray-400"
+            } h-[9px] mr-2 w-[9px] justify-center rounded-full`}
+          ></View>{" "}
+          {item?.status}
+        </Text>
+      </View>
+      <Text style={styles.subText}>
+        {new Date(item.startDate).toDateString()},{" "}
+        {new Date(item.startDate).toLocaleTimeString()}
+      </Text>
+      <Text style={styles.subText}>Entry Free</Text>
+      <View style={styles.coinsContainer}>
+        {/* <Ionicons name="ios-cash" size={20} color="gold" /> */}
+        <Text style={styles.coinText}>50 Coins</Text>
+        {/* <Ionicons name="ios-cash" size={20} color="gold" style={{ marginLeft: 15 }} /> */}
+        <Text style={styles.coinText}>1000 Coins</Text>
+      </View>
     </View>
   );
 
   const LeaveRequestsRoute = () => (
-    <FlatList
-      data={[
-        ...(requestData?.leavesApproved || []),
-        ...(requestData?.leavesRejected || []),
-        ...(requestData?.leavesPending || [])
-      ]|| []}
-      renderItem={renderLeaveItem}
-      keyExtractor={(item) => item._id}
-      ListEmptyComponent={<Text>No leave requests available</Text>}
-    />
+    <View className=" mb-20">
+      <FlatList
+        data={
+          [
+            ...(requestData?.leavesPending || []),
+            ...(requestData?.leavesApproved || []),
+            ...(requestData?.leavesRejected || []),
+          ] || []
+        }
+        renderItem={renderLeaveItem}
+        keyExtractor={(item) => item._id}
+        ListEmptyComponent={<Text>No leave requests available</Text>}
+      />
+    </View>
   );
 
   const RegularizationsRoute = () => (
-    <FlatList
-      data={[
-        ...(requestData?.regularizationsApproved || []),
-        ...(requestData?.regularizationsPending || []),
-        ...(requestData?.regularizationsRejected || [])
-      ] || []}
-      renderItem={renderRegularizationItem}
-      keyExtractor={(item) => item._id}
-      ListEmptyComponent={<Text>No regularizations available</Text>}
-    />
+    <View className=" mb-20">
+      <FlatList
+        data={
+          [
+            ...(requestData?.regularizationsPending || []),
+            ...(requestData?.regularizationsApproved || []),
+            ...(requestData?.regularizationsRejected || []),
+          ] || []
+        }
+        renderItem={renderRegularizationItem}
+        keyExtractor={(item) => item._id}
+        ListEmptyComponent={<Text>No regularizations available</Text>}
+      />
+    </View>
   );
 
   const renderScene = SceneMap({
@@ -84,9 +154,13 @@ export default function LeaveScreen() {
   });
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <View style={{ flex: 1 }}>
       {loading ? (
-        <Text>Loading...</Text>
+        <ActivityIndicator
+          size="large"
+          color="#0000ff"
+          className=" flex-row justify-center align-middle min-h-screen "
+        />
       ) : (
         <TabView
           navigationState={{ index, routes }}
@@ -103,6 +177,36 @@ export default function LeaveScreen() {
           )}
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  card: {
+    padding: 15,
+    marginVertical: 8,
+    marginHorizontal: 10,
+    borderRadius: 10,
+    backgroundColor: "white",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  subText: {
+    fontSize: 14,
+    color: "#777",
+    marginBottom: 5,
+  },
+  coinsContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 5,
+  },
+  coinText: {
+    marginLeft: 5,
+    fontSize: 14,
+    color: "#333",
+  },
+});

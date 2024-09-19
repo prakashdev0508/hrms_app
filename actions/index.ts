@@ -1,6 +1,7 @@
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
-import * as Location from "expo-location";
+import Toast from "react-native-root-toast";
+import { router } from "expo-router";
 
 const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL;
 let token: any = null;
@@ -8,6 +9,14 @@ let token: any = null;
 export const getToken = async () => {
   token = await SecureStore.getItemAsync("accessToken");
 };
+
+const redirectLogin = async ()=>{
+  Toast.show("Your password is changed Please Login again")
+  await SecureStore.deleteItemAsync("accessToken");
+  await SecureStore.deleteItemAsync("role");
+  await SecureStore.deleteItemAsync("organizationDetails");
+  router.push("/(auth)/Login");
+}
 
 export const loginUser = async (data: any) => {
   try {
@@ -29,6 +38,9 @@ export const getAppHomeDetails = async () => {
 
     return response.data;
   } catch (error: any) {
+    if(error.response.data.message == "Password changed. Please login again."){
+      redirectLogin()
+    }
     throw error;
   }
 };
@@ -74,6 +86,9 @@ export const getRequestList = async () => {
 
     return response.data;
   } catch (error: any) {
+    if(error.response.data.message == "Password changed. Please login again."){
+      redirectLogin()
+    }
     throw error;
   }
 };

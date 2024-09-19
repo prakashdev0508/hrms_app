@@ -8,6 +8,7 @@ import {
   Animated,
   TouchableWithoutFeedback,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -28,12 +29,13 @@ export default function HomeScreen() {
   const [buttonLoader, setButtonLoader] = useState(false);
   const [showPlusDropdown, setShowPlusDropdown] = useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
+  const [loadData, setLoadData] = useState(false);
 
   const plusDropdownAnim = useRef(new Animated.Value(0)).current;
   const userDropdownAnim = useRef(new Animated.Value(0)).current;
 
   const fetchData = async () => {
-    setRefreshing(true);
+    setLoadData(true);
     try {
       const response = await getAppHomeDetails();
       setHomeData(response?.data);
@@ -41,7 +43,7 @@ export default function HomeScreen() {
       setHomeData(null);
       console.log("errr", error);
     } finally {
-      setRefreshing(false);
+      setLoadData(false);
     }
   };
 
@@ -52,9 +54,15 @@ export default function HomeScreen() {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await fetchData();
-    console.log("Data refreshed");
-    setRefreshing(false);
+    try {
+      const response = await getAppHomeDetails();
+      setHomeData(response?.data);
+    } catch (error: any) {
+      setHomeData(null);
+      console.log("errr", error);
+    } finally {
+      setRefreshing(false);
+    }
   };
 
   const handleCheckIn = async () => {
@@ -218,21 +226,25 @@ export default function HomeScreen() {
   };
 
   return (
-    <SafeAreaView className="bg-white flex-1">
+    <View className="bg-white flex-1 ">
       <ScrollView
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {refreshing ? (
-          <View className="text-center">
-            <Text>Loading...</Text>
+        {loadData ? (
+          <View className=" flex-row justify-center align-middle min-h-screen ">
+            <ActivityIndicator
+              size="large"
+              color="#0000ff"
+              className=" flex-row justify-center align-middle min-h-screen "
+            />
           </View>
         ) : (
           <>
             {/* Header Section */}
-            <View className="bg-purple-600 p-4 rounded-b-3xl z-10">
-              <View className="flex-row justify-between">
+            <View className="bg-purple-800 p-4 rounded-b-3xl z-10">
+              <View className="flex-row justify-between mt-8">
                 <View>
                   <View className="flex-row justify-between items-center">
                     <Text className="text-white text-sm">{getGreeting()}</Text>
@@ -271,14 +283,14 @@ export default function HomeScreen() {
                         className=" mx-1 mb-4 "
                         onPress={() => setShowPlusDropdown(false)}
                       >
-                        <Text>Leave</Text>
+                        <Text>Apply Leave Request</Text>
                       </Link>
                       <Link
                         href={"/(extraroutes)/applyregularisation"}
                         className=" mx-1 "
                         onPress={() => setShowPlusDropdown(false)}
                       >
-                        <Text>Regularisation</Text>
+                        <Text>Apply Regularisation</Text>
                       </Link>
                     </Animated.View>
                   )}
@@ -322,7 +334,7 @@ export default function HomeScreen() {
                 </View>
               </View>
 
-              <View className="p-6 mt-4">
+              <View className="p-6 mt-10">
                 <View className="bg-white p-4 rounded-xl shadow-lg">
                   <Text className="text-center text-lg font-semibold text-gray-700 mb-2">
                     {moment().format("ddd MMM DD, YYYY")}
@@ -368,13 +380,13 @@ export default function HomeScreen() {
                   {homeData?.attendanceStatus != "checked_in" &&
                     homeData?.attendanceStatus != "paid_leave" &&
                     homeData?.attendanceStatus != "not_available" && (
-                      <TouchableOpacity
-                        className={`bg-gray-500 p-4 rounded-lg`}
+                      <View
+                        className={`bg-gray-500 p-4 rounded-lg w-full text-center py-3`}
                       >
                         <Text className="text-center text-white font-bold text-lg">
                           {getName(homeData?.attendanceStatus)}
                         </Text>
-                      </TouchableOpacity>
+                      </View>
                     )}
                 </View>
               </View>
@@ -437,7 +449,7 @@ export default function HomeScreen() {
           </>
         )}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
