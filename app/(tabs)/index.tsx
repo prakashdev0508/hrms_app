@@ -20,6 +20,7 @@ import { checkIn, checkOut, getAppHomeDetails, getToken } from "@/actions";
 import * as Location from "expo-location";
 import Toast from "react-native-root-toast";
 import moment from "moment";
+import { Link } from "expo-router";
 
 export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
@@ -265,16 +266,20 @@ export default function HomeScreen() {
                       ]}
                       className="absolute right-10 top-12 bg-white rounded-md shadow-lg p-2 z-50 border border-gray-300 dropdown"
                     >
-                      <TouchableOpacity
-                        onPress={() => console.log("Leave clicked")}
+                      <Link
+                        href={"/(extraroutes)/applyleave"}
+                        className=" mx-1 mb-4 "
+                        onPress={() => setShowPlusDropdown(false)}
                       >
-                        <Text className="p-2">Leave</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        onPress={() => console.log("Regularisation clicked")}
+                        <Text>Leave</Text>
+                      </Link>
+                      <Link
+                        href={"/(extraroutes)/applyregularisation"}
+                        className=" mx-1 "
+                        onPress={() => setShowPlusDropdown(false)}
                       >
-                        <Text className="p-2">Regularisation</Text>
-                      </TouchableOpacity>
+                        <Text>Regularisation</Text>
+                      </Link>
                     </Animated.View>
                   )}
 
