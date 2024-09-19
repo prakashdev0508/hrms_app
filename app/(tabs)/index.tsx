@@ -22,8 +22,10 @@ import * as Location from "expo-location";
 import Toast from "react-native-root-toast";
 import moment from "moment";
 import { Link } from "expo-router";
+import { useAuth } from "../context/AuthContext";
 
 export default function HomeScreen() {
+  const { onLogout } = useAuth()
   const [refreshing, setRefreshing] = useState(false);
   const [homeData, setHomeData] = useState<any>(null);
   const [buttonLoader, setButtonLoader] = useState(false);
@@ -283,14 +285,14 @@ export default function HomeScreen() {
                         className=" mx-1 mb-4 "
                         onPress={() => setShowPlusDropdown(false)}
                       >
-                        <Text>Apply Leave Request</Text>
+                        <Text> Leave Request</Text>
                       </Link>
                       <Link
                         href={"/(extraroutes)/applyregularisation"}
                         className=" mx-1 "
                         onPress={() => setShowPlusDropdown(false)}
                       >
-                        <Text>Apply Regularisation</Text>
+                        <Text> Regularisation</Text>
                       </Link>
                     </Animated.View>
                   )}
@@ -325,7 +327,7 @@ export default function HomeScreen() {
                         <Text className="p-2">Profile</Text>
                       </TouchableOpacity>
                       <TouchableOpacity
-                        onPress={() => console.log("Logout clicked")}
+                        onPress={() => onLogout()}
                       >
                         <Text className="p-2">Logout</Text>
                       </TouchableOpacity>

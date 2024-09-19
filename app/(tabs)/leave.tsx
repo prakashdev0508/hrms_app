@@ -80,7 +80,7 @@ export default function LeaveScreen() {
       <View className=" flex-row justify-between">
         <Text className=" font-JakartaSemiBold mb-3">
           {" "}
-          {moment(item?.appliedDate).format("D MMM YYYY")}{" "}
+          {moment(item?.date).format("D MMM YYYY")}{" "}
         </Text>
         <Text
           className={` px-2 py-1 rounded-md text-xs font-JakartaSemiBold uppercase flex-row`}
@@ -88,29 +88,28 @@ export default function LeaveScreen() {
           {" "}
           <View
             className={`${
-              item?.status == "approved"
+              item?.regularizeRequest == "approved"
                 ? "bg-green-500"
-                : item?.status == "pending"
+                : item?.regularizeRequest == "pending"
                 ? "bg-yellow-500"
-                : item?.status == "rejected"
+                : item?.regularizeRequest == "rejected"
                 ? "bg-red-500"
                 : "bg-gray-400"
             } h-[9px] mr-2 w-[9px] justify-center rounded-full`}
           ></View>{" "}
-          {item?.status}
+          {item?.regularizeRequest}
         </Text>
       </View>
-      <Text style={styles.subText}>
-        {new Date(item.startDate).toDateString()},{" "}
-        {new Date(item.startDate).toLocaleTimeString()}
-      </Text>
-      <Text style={styles.subText}>Entry Free</Text>
-      <View style={styles.coinsContainer}>
-        {/* <Ionicons name="ios-cash" size={20} color="gold" /> */}
-        <Text style={styles.coinText}>50 Coins</Text>
-        {/* <Ionicons name="ios-cash" size={20} color="gold" style={{ marginLeft: 15 }} /> */}
-        <Text style={styles.coinText}>1000 Coins</Text>
-      </View>
+      <View className=" flex-row mb-1 ">
+          <Text className=" font-JakartaMedium text-sm">Check-In </Text>
+          <Text className=" mx-1 ">--</Text>
+          <Text className=" font-JakartaMedium text-sm">{moment(item?.checkInTime).format("HH:mm")}</Text>
+        </View>
+        <View className=" flex-row mb-1 ">
+          <Text className=" font-JakartaMedium text-sm">Check Out</Text>
+          <Text className=" mx-1 ">--</Text>
+          <Text className=" font-JakartaMedium text-sm">{moment(item?.checkOutTime).format("HH:mm")}</Text>
+        </View>
     </View>
   );
 
