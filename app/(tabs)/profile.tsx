@@ -6,21 +6,10 @@ import { useAuth } from "../context/AuthContext";
 export default function TabTwoScreen() {
   const { onLogout } = useAuth();
 
-  const handleCheckOut = () => {
-    onLogout();
-  };
-
   return (
     <SafeAreaView>
       <View>
-        <TouchableOpacity
-          className="bg-green-500 p-4 rounded-lg"
-          onPress={handleCheckOut}
-        >
-          <Text className="text-center text-white font-bold text-lg">
-            Log out
-          </Text>
-        </TouchableOpacity>
+        
       </View>
     </SafeAreaView>
   );

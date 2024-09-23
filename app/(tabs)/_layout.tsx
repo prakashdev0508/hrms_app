@@ -92,13 +92,21 @@ export default function TabLayout() {
         />
 
         <Tabs.Screen
-          name="explore"
+          name="profile"
           options={{
-            title: "Explore",
-            headerShown: false,
+            title: "Profile",
+            headerShown: true,
             tabBarIcon: ({ focused }) => (
               <TabIcon source={icons.person} focused={focused} />
             ),
+            headerStyle: {
+              backgroundColor: "purple",
+            },
+            headerTitleStyle: {
+              fontWeight: "bold",
+              color: "white",
+            },
+            headerTintColor: "purple",
           }}
         />
       </Tabs>

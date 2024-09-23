@@ -50,8 +50,8 @@ export default function HomeScreen() {
   };
 
   useEffect(() => {
-    fetchData();
     getToken();
+    fetchData();
   }, []);
 
   const onRefresh = async () => {
@@ -220,12 +220,6 @@ export default function HomeScreen() {
     }).start();
   };
 
-  const handleOutsideClick = (event: any) => {
-    if (!event.target.closest(".dropdown")) {
-      setShowPlusDropdown(false);
-      setShowUserDropdown(false);
-    }
-  };
 
   return (
     <View className="bg-white flex-1 ">
