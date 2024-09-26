@@ -10,6 +10,8 @@ export const getToken = async () => {
   token = await SecureStore.getItemAsync("accessToken");
 };
 
+getToken();
+
 const redirectLogin = async ()=>{
   Toast.show("Your password is changed Please Login again")
   await SecureStore.deleteItemAsync("accessToken");
@@ -111,4 +113,20 @@ export const getuserProfile = async () => {
   }
 };
 
-getToken();
+export const applyLeave = async (data: any) => {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/leave/apply`,
+      data,
+      {
+        headers: {
+          Authorization: `${token}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error: any) {
+    throw error;
+  }
+};

@@ -10,18 +10,44 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useForm, Controller } from "react-hook-form";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { Picker } from "@react-native-picker/picker";
+import { FontAwesome } from "@expo/vector-icons"; // For icons
+import { applyLeave } from "@/actions";
+import Toast from "react-native-root-toast";
+import { router } from "expo-router";
 
 const Applyleave = () => {
   const { control, handleSubmit, reset, formState } = useForm({
-    mode: "onChange", // Enable re-validation on each input change
+    mode: "onChange",
   });
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
+  const [loadingApiCall , setLoadingApiCall] = useState(false)
 
   const onSubmit = async (data: any) => {
-    console.log({ ...data, startDate, endDate });
+    setLoadingApiCall(true)
+    try {
+      const requestData = {
+        leaveType: "casual",
+        startDate: startDate,
+        endDate: endDate,
+        reason: data.reason,
+      };
+
+      const response = await applyLeave(requestData);
+      Toast.show("Leave Applied ");
+      reset()
+      router.replace("/(tabs)/leave")
+    } catch (error: any) {
+      Toast.show(error?.response?.data?.message, {
+        duration: Toast.durations.SHORT,
+        position: Toast.positions.BOTTOM,
+      });
+    }finally{
+      setLoadingApiCall(false)
+    }
   };
 
   // Handlers for Date Picker
@@ -49,9 +75,10 @@ const Applyleave = () => {
           <Text className="text-base text-gray-700">Start Date</Text>
           <TouchableOpacity
             onPress={() => setShowStartPicker(true)}
-            className="border p-2 mt-2 rounded-md border-gray-300 bg-white"
+            className="border p-2 mt-2 rounded-md border-gray-300 bg-white flex-row justify-between items-center"
           >
             <Text>{startDate.toISOString().split("T")[0]}</Text>
+            <FontAwesome name="calendar" size={20} color="gray" />
           </TouchableOpacity>
           {showStartPicker && (
             <DateTimePicker
@@ -68,9 +95,10 @@ const Applyleave = () => {
           <Text className="text-base text-gray-700">End Date</Text>
           <TouchableOpacity
             onPress={() => setShowEndPicker(true)}
-            className="border p-2 mt-2 rounded-md border-gray-300 bg-white"
+            className="border p-2 mt-2 rounded-md border-gray-300 bg-white flex-row justify-between items-center"
           >
             <Text>{endDate.toISOString().split("T")[0]}</Text>
+            <FontAwesome name="calendar" size={20} color="gray" />
           </TouchableOpacity>
           {showEndPicker && (
             <DateTimePicker
@@ -81,6 +109,8 @@ const Applyleave = () => {
             />
           )}
         </View>
+
+        {/* Reason Input */}
         <View className="mb-4">
           <Text className="text-base text-gray-700">Reason</Text>
           <Controller
@@ -96,14 +126,11 @@ const Applyleave = () => {
                   className="border p-2 mt-2 rounded-md border-gray-300 bg-white"
                   placeholder="Reason for leave"
                   value={value}
-                  onChangeText={(text) => onChange(text.trim())}
+                  onChangeText={(text) => onChange(text)}
                   multiline={true}
                   numberOfLines={4}
                   textAlignVertical="top"
                 />
-                {error && (
-                  <Text className="text-red-500 text-sm">{error.message}</Text>
-                )}
               </>
             )}
           />
@@ -113,12 +140,12 @@ const Applyleave = () => {
         <TouchableOpacity
           onPress={handleSubmit(onSubmit)}
           className={`p-3 rounded-md ${
-            formState.isValid ? "bg-purple-600" : "bg-gray-400"
+            (!formState.isValid || loadingApiCall) ? "bg-gray-400" : "bg-purple-600"
           }`}
-          disabled={!formState.isValid} // Disable the button if form is invalid
+          disabled={!formState.isValid || loadingApiCall}
         >
           <Text className="text-center text-white font-bold">
-            Submit Leave Request
+            {loadingApiCall ? "Submitting..." : "Submit Leave Request"}
           </Text>
         </TouchableOpacity>
       </ScrollView>

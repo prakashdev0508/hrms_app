@@ -4,6 +4,7 @@ import { loginUser } from "@/actions";
 import { ToastAndroid } from "react-native";
 import { useRouter } from "expo-router";
 import Toast from "react-native-root-toast";
+import * as FileSystem from "expo-file-system";
 
 interface AuthState {
   token: string | null;
@@ -96,6 +97,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     await SecureStore.deleteItemAsync(TOKEN_KEY);
     await SecureStore.deleteItemAsync("role");
     await SecureStore.deleteItemAsync("organizationDetails");
+
+    // Clear cache (if applicable)
+    const cacheDirectory = `${FileSystem.documentDirectory}Cache/`;
+    const cacheExists = await FileSystem.getInfoAsync(cacheDirectory);
+    if (cacheExists.exists) {
+      await FileSystem.deleteAsync(cacheDirectory, { idempotent: true });
+    }
+
     router.push("/(auth)/Login");
     setAuthState({
       token: null,
