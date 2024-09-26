@@ -25,7 +25,7 @@ import { Link } from "expo-router";
 import { useAuth } from "../context/AuthContext";
 
 export default function HomeScreen() {
-  const { onLogout } = useAuth()
+  const { onLogout } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
   const [homeData, setHomeData] = useState<any>(null);
   const [buttonLoader, setButtonLoader] = useState(false);
@@ -220,7 +220,6 @@ export default function HomeScreen() {
     }).start();
   };
 
-
   return (
     <View className="bg-white flex-1 ">
       <ScrollView
@@ -320,9 +319,7 @@ export default function HomeScreen() {
                       >
                         <Text className="p-2">Profile</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity
-                        onPress={() => onLogout()}
-                      >
+                      <TouchableOpacity onPress={() => onLogout()}>
                         <Text className="p-2">Logout</Text>
                       </TouchableOpacity>
                     </Animated.View>

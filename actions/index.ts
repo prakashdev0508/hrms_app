@@ -93,4 +93,22 @@ export const getRequestList = async () => {
   }
 };
 
+
+export const getuserProfile = async () => {
+  try {
+    const response = await axios.get(`${BASE_URL}/app/user_details`, {
+      headers: {
+        Authorization: `${token}`,
+      },
+    });
+
+    return response.data;
+  } catch (error: any) {
+    if(error.response.data.message == "Password changed. Please login again."){
+      redirectLogin()
+    }
+    throw error;
+  }
+};
+
 getToken();
