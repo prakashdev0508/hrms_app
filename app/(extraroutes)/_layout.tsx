@@ -23,7 +23,19 @@ const Layout = () => {
       />
       <Stack.Screen
         name="applyregularisation"
-        options={{ headerShown: false }}
+        options={{
+            title: " Apply Regularization ",
+            headerShown: true,
+            headerStyle: {
+              backgroundColor: "purple",
+              
+            },
+            headerTitleStyle: {
+              fontWeight: "bold",
+              color: "white",
+            },
+            headerTintColor: "white",
+          }}
       />
     </Stack>
   );

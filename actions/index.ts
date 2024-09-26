@@ -130,3 +130,21 @@ export const applyLeave = async (data: any) => {
     throw error;
   }
 };
+
+export const applyRegularization = async (data: any) => {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/attendence/regularize/apply`,
+      data,
+      {
+        headers: {
+          Authorization: `${token}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error: any) {
+    throw error;
+  }
+};
